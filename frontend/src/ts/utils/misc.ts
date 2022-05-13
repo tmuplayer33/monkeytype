@@ -579,7 +579,12 @@ export function getNumbers(len: number): string {
   const randLen = randomIntFromRange(1, len);
   let ret = "";
   for (let i = 0; i < randLen; i++) {
-    const randomNum = randomIntFromRange(0, 9);
+    let randomNum;
+    if (i === 0) {
+      randomNum = randomIntFromRange(1, 9);
+    } else {
+      randomNum = randomIntFromRange(0, 9);
+    }
     ret += randomNum.toString();
   }
   return ret;
@@ -661,10 +666,19 @@ export function getPositionString(number: number): string {
   return number + numend;
 }
 
-export function findGetParameter(parameterName: string): string | null {
+export function findGetParameter(
+  parameterName: string,
+  getOverride?: string
+): string | null {
   let result = null;
   let tmp = [];
-  location.search
+
+  let search = location.search;
+  if (getOverride) {
+    search = getOverride;
+  }
+
+  search
     .substr(1)
     .split("&")
     .forEach(function (item) {
@@ -1104,18 +1118,6 @@ export function createErrorMessage(error: unknown, message: string): string {
   }
 
   return message;
-}
-
-export function isQuoteFavorite(
-  snapshot: MonkeyTypes.Snapshot,
-  quoteLang: string,
-  quoteId: string
-): boolean {
-  if (!snapshot) return false;
-
-  if (!Object.keys(snapshot.favoriteQuotes).includes(quoteLang)) return false;
-
-  return snapshot.favoriteQuotes[quoteLang].includes(quoteId);
 }
 
 export function isAnyPopupVisible(): boolean {

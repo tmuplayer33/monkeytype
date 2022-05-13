@@ -7,17 +7,17 @@ import * as ManualRestart from "../test/manual-restart-tracker";
 import * as CustomText from "../test/custom-text";
 import { restart as restartTest } from "../test/test-logic";
 
-export function loadCustomThemeFromUrl(): void {
-  const getValue = Misc.findGetParameter("customTheme");
+export function loadCustomThemeFromUrl(getOverride?: string): void {
+  const getValue = Misc.findGetParameter("customTheme", getOverride);
   if (getValue === null) return;
 
   const urlEncoded = getValue.split(",");
   const base64decoded = JSON.parse(atob(getValue) ?? "");
 
   let colorArray = [];
-  if (Array.isArray(urlEncoded) && urlEncoded.length === 9) {
+  if (Array.isArray(urlEncoded) && urlEncoded.length === 10) {
     colorArray = urlEncoded;
-  } else if (Array.isArray(base64decoded) && base64decoded.length === 9) {
+  } else if (Array.isArray(base64decoded) && base64decoded.length === 10) {
     colorArray = base64decoded;
   }
 
@@ -51,8 +51,8 @@ type SharedTestSettings = [
   string | null
 ];
 
-export function loadTestSettingsFromUrl(): void {
-  const getValue = Misc.findGetParameter("testSettings");
+export function loadTestSettingsFromUrl(getOverride?: string): void {
+  const getValue = Misc.findGetParameter("testSettings", getOverride);
   if (getValue === null) return;
 
   const de: SharedTestSettings = JSON.parse(decompressFromURI(getValue) ?? "");

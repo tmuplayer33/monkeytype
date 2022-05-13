@@ -80,6 +80,7 @@ export async function initSnapshot(): Promise<
     snap.banned = userData.banned;
     snap.verified = userData.verified;
     snap.discordId = userData.discordId;
+    snap.needsToChangeName = userData.needsToChangeName;
     snap.globalStats = {
       time: userData.timeTyping,
       started: userData.startedTests,
@@ -125,6 +126,11 @@ export async function initSnapshot(): Promise<
     // LoadingPage.updateText("Downloading tags...");
     snap.customThemes = userData.customThemes ?? [];
     snap.tags = tagsData;
+
+    snap.tags.forEach((tag) => {
+      tag.display = tag.name.replaceAll("_", " ");
+    });
+
     snap.tags = snap.tags?.sort((a, b) => {
       if (a.name > b.name) {
         return 1;
@@ -141,6 +147,11 @@ export async function initSnapshot(): Promise<
     // }
     // LoadingPage.updateText("Downloading presets...");
     snap.presets = presetsData;
+
+    snap.presets?.forEach((preset) => {
+      preset.display = preset.name.replaceAll("_", " ");
+    });
+
     snap.presets = snap.presets?.sort((a, b) => {
       if (a.name > b.name) {
         return 1;
@@ -188,6 +199,13 @@ export async function getUserResults(): Promise<boolean> {
       }
       if (result.numbers === undefined) result.numbers = false;
       if (result.punctuation === undefined) result.punctuation = false;
+      if (result.quoteLength === undefined) result.quoteLength = -1;
+      if (result.restartCount === undefined) result.restartCount = 0;
+      if (result.incompleteTestSeconds === undefined) {
+        result.incompleteTestSeconds = 0;
+      }
+      if (result.afkDuration === undefined) result.afkDuration = 0;
+      if (result.tags === undefined) result.tags = [];
     });
     dbSnapshot.results = results?.sort((a, b) => b.timestamp - a.timestamp);
     return true;

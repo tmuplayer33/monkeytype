@@ -13,6 +13,7 @@ import * as GlarsesMode from "../states/glarses-mode";
 import * as TestInput from "./test-input";
 import * as Notifications from "../elements/notifications";
 import * as Loader from "../elements/loader";
+import QuotesController from "../controllers/quotes-controller";
 import { Chart } from "chart.js";
 import { Auth } from "../firebase";
 
@@ -392,7 +393,7 @@ function updateTags(dontSave: boolean): void {
       Config.lazyMode
     );
     $("#result .stats .tags .bottom").append(`
-      <div tagid="${tag._id}" aria-label="PB: ${tpb}" data-balloon-pos="up">${tag.name}<i class="fas fa-crown hidden"></i></div>
+      <div tagid="${tag._id}" aria-label="PB: ${tpb}" data-balloon-pos="up">${tag.display}<i class="fas fa-crown hidden"></i></div>
     `);
     if (Config.mode != "quote" && !dontSave) {
       if (tpb < result.wpm) {
@@ -417,7 +418,7 @@ function updateTags(dontSave: boolean): void {
           "aria-label",
           "+" + Misc.roundTo2(result.wpm - tpb)
         );
-        // console.log("new pb for tag " + tag.name);
+        // console.log("new pb for tag " + tag.display);
       } else {
         const themecolors = await ThemeColors.getAll();
         resultAnnotation.push({
@@ -444,7 +445,7 @@ function updateTags(dontSave: boolean): void {
             position: annotationSide,
             xAdjust: labelAdjust,
             enabled: true,
-            content: `${tag.name} PB: ${Misc.roundTo2(
+            content: `${tag.display} PB: ${Misc.roundTo2(
               Config.alwaysShowCPM ? tpb * 5 : tpb
             ).toFixed(2)}`,
           },
@@ -581,17 +582,15 @@ function updateQuoteFavorite(randomQuote: MonkeyTypes.Quote): void {
   quoteLang = Config.mode === "quote" ? randomQuote.language : "";
   quoteId = Config.mode === "quote" ? randomQuote.id.toString() : "";
 
-  const $icon = $(".pageTest #result #favoriteQuoteButton .icon");
+  const icon = $(".pageTest #result #favoriteQuoteButton .icon");
 
   if (Config.mode === "quote" && Auth.currentUser) {
-    const userFav = Misc.isQuoteFavorite(DB.getSnapshot(), quoteLang, quoteId);
+    const userFav = QuotesController.isQuoteFavorite(randomQuote);
 
-    $icon
-      .removeClass(userFav ? "far" : "fas")
-      .addClass(userFav ? "fas" : "far");
-    $icon.parent().removeClass("hidden");
+    icon.removeClass(userFav ? "far" : "fas").addClass(userFav ? "fas" : "far");
+    icon.parent().removeClass("hidden");
   } else {
-    $icon.parent().addClass("hidden");
+    icon.parent().addClass("hidden");
   }
 }
 
